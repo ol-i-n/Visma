@@ -104,7 +104,7 @@ namespace Visma
             }
         }
 
-        public void DateOfBirthIssue()
+        public void DateOfBirthWithBackspace()
         {
             String text = driver.FindElement(By.Id("dateOfBirthInput")).GetAttribute("value");
 
@@ -115,6 +115,8 @@ namespace Visma
             }
 
             driver.FindElement(By.Id("dateOfBirthInput")).Click();
+            driver.FindElement(By.Id("dateOfBirthInput")).SendKeys("1.1.2000");
+
         }
 
         public void FillHobbies(string subjectName)
@@ -164,6 +166,14 @@ namespace Visma
 
             driver.FindElement(By.Id("closeLargeModal")).Click();
         }
+
+        public bool wontCreatFormular()
+        {
+            //verify if pop-up formular was created when user enter wrong email adress
+            bool isElementdisplayed = driver.FindElements(By.Id("closeLargeModal")).Count == 0;
+
+            return isElementdisplayed;           
+        }
     }
 
 
@@ -198,17 +208,49 @@ namespace Visma
         }
 
         [TestMethod]
-        public void FillFormTestNegative()
+        public void EnterDateOfBirthThroughtInput()
         {
             formHelper.FillPersonalInfo("John", "Doe", "john.doe@example.com", "Male", "1234567890", "Vysokoskolska 253, Kosice 040 01", "Sports");
-            //formHelper.DateOfBirthIssue();
             formHelper.FillDateOfBirthIssue("01 Jan 2000");
-            formHelper.FillHobbies("Computer Science");
-            formHelper.FillHobbies("Physics");
-            formHelper.FillHobbies("English");
-            formHelper.TestFileUpload(@"C:\Users\bambu\Pictures\Screenshots\Screenshot 2023-10-29 165728.png");
-            formHelper.FillState("NCR", "Delhi");
+        }
+
+        [TestMethod]
+        public void EnterBirthDateWithBackspace()
+        {
+            formHelper.DateOfBirthWithBackspace();
             formHelper.SubmitFormular();
+        }
+
+        [TestMethod]
+        public void EnterWrongEmailAdress()
+        {
+            formHelper.FillPersonalInfo("John", "Doe", "@#$", "Male", "1234567890", "Vysokoskolska 253, Kosice 040 01", "Sports");
+            formHelper.SubmitFormular();
+            Assert.IsTrue(formHelper.wontCreatFormular());
+        }
+
+        [TestMethod]
+        public void EnterMissingUserName()
+        {
+            formHelper.FillPersonalInfo("", "Doe", "john.doe@example.com", "Male", "1234567890", "Vysokoskolska 253, Kosice 040 01", "Sports");
+            formHelper.SubmitFormular();
+            Assert.IsTrue(formHelper.wontCreatFormular());
+        }
+
+        [TestMethod]
+        public void NoChooseGender()
+        {
+            formHelper.FillPersonalInfo("John", "Doe", "john.doe@example.com", "", "1234567890", "Vysokoskolska 253, Kosice 040 01", "Sports");
+            formHelper.SubmitFormular();
+            Assert.IsTrue(formHelper.wontCreatFormular());
+        }
+
+        [TestMethod]
+        public void EnterWrongPhoneNumber()
+        {
+            formHelper.FillPersonalInfo("Jhon", "Doe", "john.doe@example.com", "Male", "0", "Vysokoskolska 253, Kosice 040 01", "Sports");
+            formHelper.SubmitFormular();
+            Assert.IsTrue(formHelper.wontCreatFormular());
         }
 
         [TestCleanup]
