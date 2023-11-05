@@ -32,7 +32,6 @@ namespace Visma
             }
             catch (Exception ex)
             {
-                // Optionally, handle other exceptions if necessary
                 Console.WriteLine(ex.Message);
                 throw;  // Re-throw exception if it's not an ElementClickInterceptedException
             }
